@@ -29,11 +29,13 @@ def get_summary(topic, lang="en"):
     try:
         url = f"https://{lang}.wikipedia.org/api/rest_v1/page/summary/{topic.replace(' ', '_')}"
         response = requests.get(url)
+        if response.status_code == 404:
+            return topic, f"❗ This topic is not available in {lang}. Try searching in English.", None
         response.raise_for_status()
         data = response.json()
         return data.get("title", topic), data.get("extract", "No summary available."), data.get("thumbnail", {}).get("source", None)
     except Exception as e:
-        return topic, "Error retrieving summary.", None
+        return topic, f"Error retrieving summary: {e}", None
 
 # Language code mapping (for Wikipedia API)
 lang_map = {
